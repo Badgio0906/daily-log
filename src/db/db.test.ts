@@ -104,7 +104,7 @@ describe('項目と設定', () => {
     await setItemVisible(ITEM_IDS.outing, false)
     expect((await db.itemDefs.get(ITEM_IDS.mood))?.visible).toBe(true)
     expect((await db.itemDefs.get(ITEM_IDS.outing))?.visible).toBe(false)
-    const hist = await db.itemDefHistory.where('itemId').equals(ITEM_IDS.outing).toArray()
+    const hist = await db.itemDefHistory.where('itemId').equals(ITEM_IDS.outing).sortBy('at')
     expect(hist.map((h) => h.change)).toEqual(['added', 'hidden'])
   })
 
