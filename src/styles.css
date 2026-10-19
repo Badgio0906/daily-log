@@ -571,3 +571,106 @@ select {
 .about p {
   margin-bottom: 10px;
 }
+
+/* 書き出し */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 印刷用レポート:印刷で崩れないよう、幅を固定して作る */
+.report-wrap {
+  background: var(--bg);
+  min-height: 100dvh;
+  padding: calc(env(safe-area-inset-top) + 8px) 0 calc(env(safe-area-inset-bottom) + 24px);
+  overflow-x: auto;
+}
+.report-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px 8px;
+  position: sticky;
+  left: 0;
+  max-width: 100vw;
+}
+.report-hint {
+  padding: 0 16px;
+  position: sticky;
+  left: 0;
+  max-width: 100vw;
+}
+.report {
+  width: 640px;
+  margin: 0 auto;
+  background: #fff;
+  color: #222;
+  padding: 24px;
+  border-radius: 8px;
+}
+.report .muted {
+  color: #6b6b6b;
+}
+.report h1 {
+  font-size: 20px;
+}
+.report h2 {
+  font-size: 15px;
+  margin-top: 4px;
+}
+.report-section {
+  margin-top: 16px;
+  break-inside: avoid;
+}
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  line-height: 1.4;
+}
+.report-table th,
+.report-table td {
+  border: 1px solid #d8d6d0;
+  padding: 3px 5px;
+  vertical-align: top;
+  text-align: left;
+}
+.report-table th {
+  background: #f1f0ec;
+}
+.report-table tr {
+  break-inside: avoid;
+}
+.nowrap {
+  white-space: nowrap;
+}
+.report footer {
+  margin-top: 16px;
+}
+
+@media print {
+  @page {
+    margin: 12mm;
+  }
+  html,
+  body,
+  .report-wrap {
+    background: #fff !important;
+    color: #222;
+    padding: 0;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .report {
+    padding: 0;
+    margin: 0;
+  }
+  .report-section.table-section {
+    break-inside: auto;
+  }
+}
+.report h2 {
+  break-after: avoid;
+}

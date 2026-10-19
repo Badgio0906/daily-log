@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useAppData, useNow } from './hooks'
+import { ExportScreen, type ReportRequest } from './screens/ExportScreen'
 import { ListScreen } from './screens/ListScreen'
+import { ReportView } from './screens/ReportView'
 import { ReviewScreen } from './screens/ReviewScreen'
 import { SettingsScreen } from './screens/SettingsScreen'
 import { TodayScreen } from './screens/TodayScreen'
@@ -19,17 +21,22 @@ export function App() {
   const data = useAppData()
   const now = useNow()
   const [tab, setTab] = useState<Tab>('today')
+  const [report, setReport] = useState<ReportRequest | null>(null)
 
   if (!data) return <div className="loading">読み込み中…</div>
+
+  if (report) {
+    return <ReportView data={data} now={now} request={report} onClose={() => setReport(null)} />
+  }
 
   return (
     <div className="app">
       <main className="main">
         {tab === 'today' && <TodayScreen data={data} now={now} onGoExport={() => setTab('export')} />}
-        {tab === 'list' && <ListScreen data={data} now={now} />}
         {tab === 'review' && <ReviewScreen data={data} now={now} />}
+        {tab === 'list' && <ListScreen data={data} now={now} />}
+        {tab === 'export' && <ExportScreen data={data} now={now} onOpenReport={setReport} />}
         {tab === 'settings' && <SettingsScreen data={data} />}
-        {tab === 'export' && <div className="screen"><p className="muted">準備中です</p></div>}
       </main>
       <nav className="tabbar" aria-label="画面の切り替え">
         {TABS.map((t) => (
