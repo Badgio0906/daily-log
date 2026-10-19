@@ -1,0 +1,12 @@
+node_modules/
+dist/
+dev-dist/
+coverage/
+*.local
+.DS_Store
+
+# 記録データ・書き出したファイルはコミットしない
+*.csv
+backup*.json
+daily-log-backup*.json
+exports/
