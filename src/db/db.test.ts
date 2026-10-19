@@ -5,16 +5,13 @@ import {
   alive,
   db,
   deleteSleep,
-  endSleep,
   ensureInitialized,
   exportAll,
-  getOpenSleep,
   getSettings,
   restoreAll,
   saveTodayValue,
   setCutoff,
   setItemVisible,
-  startSleep,
   updateSleep,
 } from './db'
 import { SCHEMA_VERSION } from './migrations'
@@ -43,25 +40,17 @@ describe('初期化', () => {
 })
 
 describe('睡眠', () => {
-  test('寝る→起きたを3回押すと3回分が残る', async () => {
-    for (const [s, e] of [
+  test('きょう画面から1日に3回記録すると3回分が残る', async () => {
+    for (const [st, e] of [
       ['2026-10-02T13:00:00Z', '2026-10-02T20:00:00Z'],
       ['2026-10-03T03:00:00Z', '2026-10-03T04:00:00Z'],
       ['2026-10-03T08:00:00Z', '2026-10-03T08:30:00Z'],
     ]) {
-      const sl = await startSleep(new Date(s))
-      await endSleep(sl.id, new Date(e), 'live')
+      await addSleep(new Date(st), new Date(e), 'live')
     }
     const all = alive(await db.sleeps.toArray())
     expect(all).toHaveLength(3)
-    expect(all.every((s) => s.end && s.startMethod === 'live' && s.endMethod === 'live')).toBe(true)
-  })
-
-  test('睡眠中にもう一度「寝る」を押しても二重にならない', async () => {
-    const a = await startSleep(new Date('2026-10-02T13:00:00Z'))
-    const b = await startSleep(new Date('2026-10-02T14:00:00Z'))
-    expect(b.id).toBe(a.id)
-    expect((await getOpenSleep())?.id).toBe(a.id)
+    expect(all.every((x) => x.end && x.startMethod === 'live' && x.endMethod === 'live')).toBe(true)
   })
 
   test('後から追加・修正・削除。削除しても実際には消えない', async () => {
@@ -118,8 +107,7 @@ describe('項目と設定', () => {
 
 describe('バックアップと復元', () => {
   test('書き出して、消してから復元すると元に戻る', async () => {
-    const s = await startSleep(new Date('2026-10-02T13:00:00Z'))
-    await endSleep(s.id, new Date('2026-10-02T20:00:00Z'), 'live')
+    await addSleep(new Date('2026-10-02T13:00:00Z'), new Date('2026-10-02T20:00:00Z'), 'live')
     await saveTodayValue((await db.itemDefs.get(ITEM_IDS.mood))!, 2, null, 240, new Date('2026-10-02T01:00:00Z'))
     await setCutoff(300)
     const backup = JSON.parse(JSON.stringify(await exportAll()))

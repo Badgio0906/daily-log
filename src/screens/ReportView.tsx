@@ -70,7 +70,7 @@ export function ReportView({
 
         <section className="report-section">
           <h2>睡眠時間</h2>
-          <SleepLegend maxIndex={chart.maxIndex} />
+          <SleepLegend maxIndex={chart.maxIndex} hasOngoing={chart.segments.some((s) => s.ongoing)} />
           <SleepDurationChart data={chart} theme={LIGHT} />
         </section>
         <section className="report-section">
@@ -106,7 +106,7 @@ export function ReportView({
                       {sleeps.map((s) => (
                         <div key={s.sleep.id} className="nowrap">
                           {s.index}回目 {formatJst(s.sleep.start, 'H:mm')}〜
-                          {s.sleep.end ? formatJst(s.sleep.end, 'H:mm') : '睡眠中'}
+                          {s.sleep.end ? formatJst(s.sleep.end, 'H:mm') : '起きた時刻なし'}
                           {s.ongoing ? '' : `(${formatMinutes(s.minutes)})`}
                         </div>
                       ))}

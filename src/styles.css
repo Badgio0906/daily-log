@@ -10,7 +10,6 @@
   --warn: #a5552a;
   --danger: #b03a3a;
   --sleep: #2f4a7a;
-  --wake: #c98a1c;
   /* 回ごとの色(1回目・2回目・3回目・4回目以降)。グラフと同じ */
   --c1: #2a78d6;
   --c2: #eb6834;
@@ -33,7 +32,6 @@
     --warn: #e0a070;
     --danger: #e07a7a;
     --sleep: #3d5f99;
-    --wake: #b07a14;
     --c1: #3987e5;
     --c2: #d95926;
     --c3: #199e70;
@@ -142,19 +140,6 @@ p {
   align-items: center;
 }
 
-.sleeping-banner {
-  position: sticky;
-  top: env(safe-area-inset-top);
-  z-index: 5;
-  background: var(--sleep);
-  color: #fff;
-  border-radius: 12px;
-  padding: 12px 14px;
-  margin-bottom: 12px;
-  font-size: 18px;
-  font-weight: 600;
-  text-align: center;
-}
 
 .sleep-list {
   list-style: none;
@@ -353,11 +338,8 @@ select {
   color: #fff;
   font-size: 24px;
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.1em;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
-}
-.sleep-button.wake {
-  background: var(--wake);
 }
 .sleep-button:active {
   transform: scale(0.98);
@@ -673,4 +655,21 @@ select {
 }
 .report h2 {
   break-after: avoid;
+}
+
+/* きょう画面の睡眠の一覧 */
+.sleep-text {
+  flex: 1;
+  min-width: 0;
+}
+.btn-small {
+  min-height: 40px;
+  min-width: 64px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--accent);
+  background: var(--card);
+  color: var(--accent);
+  font-size: 15px;
+  font-weight: 600;
 }

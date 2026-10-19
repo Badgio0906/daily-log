@@ -10,7 +10,7 @@ const ONGOING_OPACITY = 0.35
 const shortDay = (d: string) => `${Number(d.slice(5, 7))}/${Number(d.slice(8, 10))}`
 
 function segmentTip(s: SleepSegment): string {
-  const end = s.end ? formatJst(s.end, 'H:mm') : '睡眠中'
+  const end = s.end ? formatJst(s.end, 'H:mm') : '起きた時刻なし'
   return `${formatDayLabel(s.day)} ${s.index}回目<br/>${formatJst(s.start, 'H:mm')}〜${end}(${formatMinutes(s.minutes)})`
 }
 
@@ -30,7 +30,7 @@ function tooltip(t: ChartTheme) {
 }
 
 /** 回ごとの色の凡例(色だけに頼らないよう文字も添える) */
-export function SleepLegend({ maxIndex }: { maxIndex: number }) {
+export function SleepLegend({ maxIndex, hasOngoing }: { maxIndex: number; hasOngoing: boolean }) {
   const n = Math.max(1, Math.min(4, maxIndex))
   return (
     <div className="legend">
@@ -40,10 +40,12 @@ export function SleepLegend({ maxIndex }: { maxIndex: number }) {
           {l}
         </span>
       ))}
-      <span className="legend-item muted">
-        <span className="dot c1 faint" aria-hidden />
-        薄い色=睡眠中
-      </span>
+      {hasOngoing && (
+        <span className="legend-item muted">
+          <span className="dot c1 faint" aria-hidden />
+          薄い色=起きた時刻なし
+        </span>
+      )}
     </div>
   )
 }

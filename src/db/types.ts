@@ -21,10 +21,10 @@ export const TIME_SLOT_LABEL: Record<TimeSlot, string> = {
   night: '夜',
 }
 
-/** 記録方法:その場で押した / 後から追加した / 後から修正した */
+/** 記録方法:その場で記録した / 後から追加した / 後から修正した */
 export type RecordMethod = 'live' | 'added' | 'edited'
 export const RECORD_METHOD_LABEL: Record<RecordMethod, string> = {
-  live: 'その場で押した',
+  live: 'その場で記録した',
   added: '後から追加した',
   edited: '後から修正した',
 }

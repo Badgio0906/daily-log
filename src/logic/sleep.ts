@@ -3,8 +3,6 @@
 import type { CutoffChange, Sleep } from '../db/types'
 import { logicalDay, type Day } from './day'
 
-/** 「起きた」の押し忘れとみなすまでの時間 */
-export const FORGOT_WAKE_HOURS = 20
 /** バックアップの案内を出すまでの日数 */
 export const BACKUP_REMINDER_DAYS = 14
 
@@ -15,10 +13,10 @@ export interface DaySleep {
   /** その日の何回目か(1から) */
   index: number
   startMs: number
-  /** 未終了なら今の時刻 */
+  /** 起きた時刻がなければ今の時刻(前の版で「寝る」だけ押した記録) */
   endMs: number
   minutes: number
-  /** 未終了 */
+  /** 起きた時刻がない */
   ongoing: boolean
 }
 
@@ -42,12 +40,6 @@ export function groupSleepsByDay(sleeps: Sleep[], cutoffMinutes: number, now: Da
     map.set(day, list)
   }
   return map
-}
-
-/** 未終了の睡眠が長く続いていて、「いつ起きましたか?」と聞くべきか */
-export function needsWakeConfirm(open: Sleep | undefined, now: Date): boolean {
-  if (!open || open.end) return false
-  return now.getTime() - Date.parse(open.start) >= FORGOT_WAKE_HOURS * 60 * MIN
 }
 
 /** 期間(from〜to)の中で区切り時刻が変わった記録。最初の設定は変更に数えない */

@@ -1,23 +1,28 @@
 import { useMemo, useRef, useState } from 'react'
-import { DateTimeField } from '../components/DateTimeField'
-import { Sheet } from '../components/Sheet'
 import { SleepEditSheet } from '../components/SleepEditSheet'
 import { SliderInput, ValueInput } from '../components/ValueInput'
-import { changeTodayValue, clearTodayValue, endSleep, saveTodayValue, startSleep } from '../db/db'
+import { changeTodayValue, clearTodayValue, saveTodayValue } from '../db/db'
 import { ITEM_IDS } from '../db/seed'
-import { TIME_SLOTS, TIME_SLOT_LABEL, type ItemDef, type LogRecord, type TimeSlot } from '../db/types'
+import { TIME_SLOTS, TIME_SLOT_LABEL, type ItemDef, type LogRecord, type Sleep, type TimeSlot } from '../db/types'
 import type { AppData } from '../hooks'
-import { formatDayLabel, formatJst, logicalDay } from '../logic/day'
+import { addDays, dayStart, formatDayLabel, formatJst, logicalDay } from '../logic/day'
 import { formatValue } from '../logic/format'
-import { backupReminderDue, formatMinutes, groupSleepsByDay, needsWakeConfirm } from '../logic/sleep'
+import { backupReminderDue, formatMinutes, groupSleepsByDay } from '../logic/sleep'
+
+const MIN = 60_000
+
+type SleepSheet = { kind: 'new' } | { kind: 'edit'; sleep: Sleep } | null
 
 export function TodayScreen({ data, now, onGoExport }: { data: AppData; now: Date; onGoExport: () => void }) {
   const cutoff = data.settings.cutoffMinutes
   const today = logicalDay(now, cutoff)
-  const todaySleeps = groupSleepsByDay(data.sleeps, cutoff, now).get(today) ?? []
-  const open = data.sleeps.filter((s) => s.end === null).sort((a, b) => b.start.localeCompare(a.start))[0]
-  const [wakeLater, setWakeLater] = useState(false)
-  const [addingSleep, setAddingSleep] = useState(false)
+  const byDay = groupSleepsByDay(data.sleeps, cutoff, now)
+  const todaySleeps = byDay.get(today) ?? []
+  // 朝に記録した夜の睡眠は、眠り始めた前の日の分になる。今日の区切り時刻より後に起きたものは、きょう画面にも出して直せるようにする
+  const todayStartMs = dayStart(today, cutoff).getTime()
+  const carriedSleeps = (byDay.get(addDays(today, -1)) ?? []).filter((s) => s.endMs > todayStartMs)
+  const shownSleeps = [...carriedSleeps.map((s) => ({ ...s, carried: true })), ...todaySleeps.map((s) => ({ ...s, carried: false }))]
+  const [sleepSheet, setSleepSheet] = useState<SleepSheet>(null)
 
   const todayRecords = useMemo(
     () => data.records.filter((r) => logicalDay(r.at, cutoff) === today).sort((a, b) => a.at.localeCompare(b.at)),
@@ -26,14 +31,12 @@ export function TodayScreen({ data, now, onGoExport }: { data: AppData; now: Dat
   const items = data.items.filter((i) => i.visible && i.id !== ITEM_IDS.sleepCount)
   const sleepCountItem = data.itemById.get(ITEM_IDS.sleepCount)
 
+  // 新しく記録するときの初めの値:起きた時刻は今(5分単位に切り捨て)、眠った時刻はその7時間前
+  const defaultEnd = new Date(Math.floor(now.getTime() / (5 * MIN)) * 5 * MIN)
+  const defaultStart = new Date(defaultEnd.getTime() - 7 * 60 * MIN)
+
   return (
     <div className="screen today">
-      {open && (
-        <div className="sleeping-banner" role="status">
-          睡眠中({formatJst(open.start, 'H時m分')}から)
-        </div>
-      )}
-
       <h1 className="day-title">{formatDayLabel(today)}</h1>
 
       {backupReminderDue(data.settings.lastBackupAt, data.settings.createdAt, now) && (
@@ -48,15 +51,21 @@ export function TodayScreen({ data, now, onGoExport }: { data: AppData; now: Dat
 
       <section className="card">
         <h2>今日の睡眠</h2>
-        {todaySleeps.length === 0 ? (
+        {shownSleeps.length === 0 ? (
           <p className="muted">まだありません</p>
         ) : (
           <ul className="sleep-list">
-            {todaySleeps.map((s) => (
+            {shownSleeps.map((s) => (
               <li key={s.sleep.id}>
                 <span className={`dot c${Math.min(s.index, 4)}`} aria-hidden />
-                {s.index}回目 {formatJst(s.sleep.start, 'H:mm')}〜{s.ongoing ? '' : formatJst(s.sleep.end!, 'H:mm')}
-                <span className="muted">({s.ongoing ? '睡眠中' : formatMinutes(s.minutes)})</span>
+                <span className="sleep-text">
+                  {s.carried && <span className="muted small">前の日の分 </span>}
+                  {s.index}回目 {formatJst(s.sleep.start, 'H:mm')}〜{s.ongoing ? '' : formatJst(s.sleep.end!, 'H:mm')}
+                  <span className="muted">({s.ongoing ? '起きた時刻なし' : formatMinutes(s.minutes)})</span>
+                </span>
+                <button className="btn-small" onClick={() => setSleepSheet({ kind: 'edit', sleep: s.sleep })}>
+                  修正
+                </button>
               </li>
             ))}
           </ul>
@@ -69,7 +78,7 @@ export function TodayScreen({ data, now, onGoExport }: { data: AppData; now: Dat
           records={todayRecords.filter((r) => r.itemId === sleepCountItem.id)}
           recordedCount={todaySleeps.length}
           cutoff={cutoff}
-          onAddSleep={() => setAddingSleep(true)}
+          onAddSleep={() => setSleepSheet({ kind: 'new' })}
         />
       )}
 
@@ -82,64 +91,21 @@ export function TodayScreen({ data, now, onGoExport }: { data: AppData; now: Dat
       )}
 
       <div className="sleep-button-area">
-        {open ? (
-          <button className="sleep-button wake" onClick={() => endSleep(open.id, new Date(), 'live')}>
-            起きた
-          </button>
-        ) : (
-          <button className="sleep-button" onClick={() => startSleep()}>
-            寝る
-          </button>
-        )}
+        <button className="sleep-button" onClick={() => setSleepSheet({ kind: 'new' })}>
+          睡眠を記録
+        </button>
       </div>
 
-      {open && !wakeLater && needsWakeConfirm(open, now) && (
-        <WakeConfirmSheet startIso={open.start} now={now} sleepId={open.id} onLater={() => setWakeLater(true)} />
-      )}
-      {addingSleep && (
+      {sleepSheet?.kind === 'new' && (
         <SleepEditSheet
-          defaultStart={new Date(now.getTime() - 60 * 60_000)}
-          defaultEnd={now}
-          onClose={() => setAddingSleep(false)}
+          defaultStart={defaultStart}
+          defaultEnd={defaultEnd}
+          method="live"
+          onClose={() => setSleepSheet(null)}
         />
       )}
+      {sleepSheet?.kind === 'edit' && <SleepEditSheet sleep={sleepSheet.sleep} onClose={() => setSleepSheet(null)} />}
     </div>
-  )
-}
-
-/** 「起きた」を押し忘れたときに、起きた時刻を補う */
-function WakeConfirmSheet({
-  startIso,
-  sleepId,
-  now,
-  onLater,
-}: {
-  startIso: string
-  sleepId: string
-  now: Date
-  onLater: () => void
-}) {
-  const startMs = Date.parse(startIso)
-  const [end, setEnd] = useState(() => new Date(Math.min(now.getTime(), startMs + 8 * 60 * 60_000)))
-  const valid = end.getTime() > startMs && end.getTime() <= Date.now() + 60_000
-  return (
-    <Sheet title="いつ起きましたか?">
-      <p>
-        {formatJst(startIso, 'M/d H:mm')} に「寝る」を押したままです。
-        <br />
-        起きた時刻を選んでください。
-      </p>
-      <DateTimeField label="起きた時刻" value={end} onChange={setEnd} />
-      {!valid && <p className="warn">寝た時刻より後で、今より前の時刻にしてください</p>}
-      <div className="sheet-actions">
-        <button className="btn-primary" disabled={!valid} onClick={() => endSleep(sleepId, end, 'added')}>
-          この時刻にする
-        </button>
-        <button className="btn-text" onClick={onLater}>
-          あとで
-        </button>
-      </div>
-    </Sheet>
   )
 }
 

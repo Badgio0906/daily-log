@@ -95,37 +95,17 @@ export async function getSettings(): Promise<Settings> {
 
 // ---- 睡眠 ----
 
-export async function getOpenSleep(): Promise<Sleep | undefined> {
-  const all = await db.sleeps.toArray()
-  return alive(all)
-    .filter((s) => s.end === null)
-    .sort((a, b) => b.start.localeCompare(a.start))[0]
-}
-
-/** 「寝る」:睡眠を始める。すでに睡眠中なら何もしない */
-export async function startSleep(now = new Date()): Promise<Sleep> {
-  return db.transaction('rw', db.sleeps, async () => {
-    const open = await getOpenSleep()
-    if (open) return open
-    const sleep: Sleep = { ...newRow(now), start: iso(now), end: null, startMethod: 'live', endMethod: null }
-    await db.sleeps.add(sleep)
-    return sleep
-  })
-}
-
-/** 「起きた」:睡眠を終える。押し忘れの補完では method に 'added' を渡す */
-export async function endSleep(id: string, end: Date, method: RecordMethod, now = new Date()): Promise<void> {
-  await db.sleeps.update(id, { end: iso(end), endMethod: method, updatedAt: iso(now) })
-}
-
-/** 押し忘れた睡眠を後から追加する */
-export async function addSleep(start: Date, end: Date | null, now = new Date()): Promise<Sleep> {
+/**
+ * 睡眠を記録する。眠った時刻と起きた時刻を選んで入れる。
+ * きょう画面の「睡眠を記録」からは method に 'live'、記録の一覧からは 'added' を渡す
+ */
+export async function addSleep(start: Date, end: Date, method: RecordMethod = 'added', now = new Date()): Promise<Sleep> {
   const sleep: Sleep = {
     ...newRow(now),
     start: iso(start),
-    end: end ? iso(end) : null,
-    startMethod: 'added',
-    endMethod: end ? 'added' : null,
+    end: iso(end),
+    startMethod: method,
+    endMethod: method,
   }
   await db.sleeps.add(sleep)
   return sleep

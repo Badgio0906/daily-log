@@ -139,7 +139,7 @@ function DayCard({
                   睡眠 {s.index}回目 {formatJst(s.sleep.start, 'H:mm')}〜
                   {s.sleep.end ? endLabel(s.sleep.start, s.sleep.end) : ''}
                 </span>
-                <span className="muted small">{s.ongoing ? '睡眠中' : formatMinutes(s.minutes)}</span>
+                <span className="muted small">{s.ongoing ? '起きた時刻なし' : formatMinutes(s.minutes)}</span>
               </button>
             </li>
           ))}

@@ -5,7 +5,6 @@ import {
   cutoffChangesInRange,
   formatMinutes,
   groupSleepsByDay,
-  needsWakeConfirm,
   sleepColorIndex,
 } from './sleep'
 
@@ -81,20 +80,11 @@ describe('睡眠の振り分け', () => {
     expect(map.get('2026-10-19')!.map((d) => d.index)).toEqual([1])
   })
 
-  test('終わっていない睡眠は今の時刻までの長さで、未終了の印が付く', () => {
+  test('起きた時刻がない睡眠(前の版の記録)は今の時刻までの長さで、印が付く', () => {
     const map = groupSleepsByDay([sleep('2026-10-19T22:00:00Z', null)], 240, now)
     const d = map.get('2026-10-20')![0]
     expect(d.ongoing).toBe(true)
     expect(d.minutes).toBe(120)
-  })
-})
-
-describe('押し忘れの判定', () => {
-  test('「寝る」から20時間たったら聞く', () => {
-    const open = sleep('2026-10-19T04:00:00Z', null)
-    expect(needsWakeConfirm(open, new Date('2026-10-19T23:59:00Z'))).toBe(false)
-    expect(needsWakeConfirm(open, new Date('2026-10-20T00:00:00Z'))).toBe(true)
-    expect(needsWakeConfirm(undefined, now)).toBe(false)
   })
 })
 

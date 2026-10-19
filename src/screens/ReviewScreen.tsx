@@ -28,13 +28,13 @@ export function ReviewScreen({ data, now }: { data: AppData; now: Date }) {
 
       <section className="card">
         <h2>睡眠時間</h2>
-        <SleepLegend maxIndex={chart.maxIndex} />
+        <SleepLegend maxIndex={chart.maxIndex} hasOngoing={chart.segments.some((s) => s.ongoing)} />
         <SleepDurationChart data={chart} theme={theme} />
       </section>
 
       <section className="card">
         <h2>睡眠の時間帯</h2>
-        <SleepLegend maxIndex={chart.maxIndex} />
+        <SleepLegend maxIndex={chart.maxIndex} hasOngoing={chart.segments.some((s) => s.ongoing)} />
         <SleepTimelineChart data={chart} theme={theme} cutoffMinutes={cutoff} />
       </section>
 
