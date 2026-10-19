@@ -1,11 +1,15 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { useAppData, useNow } from './hooks'
 import { ExportScreen, type ReportRequest } from './screens/ExportScreen'
 import { ListScreen } from './screens/ListScreen'
-import { ReportView } from './screens/ReportView'
-import { ReviewScreen } from './screens/ReviewScreen'
 import { SettingsScreen } from './screens/SettingsScreen'
 import { TodayScreen } from './screens/TodayScreen'
+
+// グラフを使う画面は大きいため、開いたときに読み込む
+const ReviewScreen = lazy(() => import('./screens/ReviewScreen').then((m) => ({ default: m.ReviewScreen })))
+const ReportView = lazy(() => import('./screens/ReportView').then((m) => ({ default: m.ReportView })))
+
+const loading = <div className="loading">読み込み中…</div>
 
 type Tab = 'today' | 'review' | 'list' | 'export' | 'settings'
 
@@ -23,17 +27,25 @@ export function App() {
   const [tab, setTab] = useState<Tab>('today')
   const [report, setReport] = useState<ReportRequest | null>(null)
 
-  if (!data) return <div className="loading">読み込み中…</div>
+  if (!data) return loading
 
   if (report) {
-    return <ReportView data={data} now={now} request={report} onClose={() => setReport(null)} />
+    return (
+      <Suspense fallback={loading}>
+        <ReportView data={data} now={now} request={report} onClose={() => setReport(null)} />
+      </Suspense>
+    )
   }
 
   return (
     <div className="app">
       <main className="main">
         {tab === 'today' && <TodayScreen data={data} now={now} onGoExport={() => setTab('export')} />}
-        {tab === 'review' && <ReviewScreen data={data} now={now} />}
+        {tab === 'review' && (
+          <Suspense fallback={loading}>
+            <ReviewScreen data={data} now={now} />
+          </Suspense>
+        )}
         {tab === 'list' && <ListScreen data={data} now={now} />}
         {tab === 'export' && <ExportScreen data={data} now={now} onOpenReport={setReport} />}
         {tab === 'settings' && <SettingsScreen data={data} />}

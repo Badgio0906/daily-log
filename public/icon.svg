@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#2f4a7a"/>
+  <!-- 月 -->
+  <circle cx="226" cy="266" r="132" fill="#f6f2e4"/>
+  <circle cx="284" cy="220" r="118" fill="#2f4a7a"/>
+  <!-- 太陽 -->
+  <circle cx="356" cy="346" r="52" fill="#eda100"/>
+</svg>
