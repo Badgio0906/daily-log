@@ -431,3 +431,65 @@ select {
 .sheet-actions .btn-primary {
   flex: 1;
 }
+
+/* 記録の一覧 */
+.day-card {
+  padding: 0;
+  overflow: hidden;
+}
+.day-head {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 12px 14px;
+  min-height: 48px;
+  text-align: left;
+}
+.day-label {
+  font-weight: 700;
+  font-size: 17px;
+}
+.day-actions {
+  display: flex;
+  gap: 8px;
+  padding: 0 14px 12px;
+}
+.day-actions button {
+  flex: 1;
+}
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+.rows li + li {
+  border-top: 1px solid var(--line);
+}
+.row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  padding: 10px 14px;
+  min-height: 44px;
+  text-align: left;
+}
+.row-time {
+  width: 3em;
+  flex: none;
+}
+.row-main {
+  flex: 1;
+  min-width: 0;
+}
+.row-value {
+  text-align: right;
+  max-width: 50%;
+  overflow-wrap: anywhere;
+}

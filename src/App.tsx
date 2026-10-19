@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAppData, useNow } from './hooks'
+import { ListScreen } from './screens/ListScreen'
 import { TodayScreen } from './screens/TodayScreen'
 
 type Tab = 'today' | 'review' | 'list' | 'export' | 'settings'
@@ -23,7 +24,8 @@ export function App() {
     <div className="app">
       <main className="main">
         {tab === 'today' && <TodayScreen data={data} now={now} onGoExport={() => setTab('export')} />}
-        {tab !== 'today' && <div className="screen"><p className="muted">準備中です</p></div>}
+        {tab === 'list' && <ListScreen data={data} now={now} />}
+        {(tab === 'review' || tab === 'export' || tab === 'settings') && <div className="screen"><p className="muted">準備中です</p></div>}
       </main>
       <nav className="tabbar" aria-label="画面の切り替え">
         {TABS.map((t) => (
