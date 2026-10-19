@@ -177,6 +177,11 @@ export async function saveTodayValue(
   })
 }
 
+/** きょう画面で、いま入力した記録の値を直す(スライダーを動かし直したときなど) */
+export async function changeTodayValue(id: string, value: RecordValue, now = new Date()): Promise<void> {
+  await db.records.update(id, { value, updatedAt: iso(now) })
+}
+
 /** きょう画面で入力を取り消す(チェックを外す、選択をやめるなど) */
 export async function clearTodayValue(itemId: string, slot: TimeSlot | null, cutoffMinutes: number, now = new Date()) {
   const existing = await findTodayRecord(itemId, slot, cutoffMinutes, now)

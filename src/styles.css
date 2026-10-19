@@ -1,0 +1,433 @@
+/* 外部フォントは使わず、端末の標準フォントだけを使う */
+:root {
+  --bg: #f6f5f2;
+  --card: #ffffff;
+  --text: #222222;
+  --muted: #6b6b6b;
+  --line: #e2e0db;
+  --accent: #3b6ea8;
+  --accent-soft: #e4edf7;
+  --warn: #a5552a;
+  --danger: #b03a3a;
+  --sleep: #2f4a7a;
+  --wake: #c98a1c;
+  /* 回ごとの色(1回目・2回目・3回目・4回目以降)。グラフと同じ */
+  --c1: #3b6ea8;
+  --c2: #e08a2e;
+  --c3: #3a9a6a;
+  --c4: #8a5cb8;
+  --tabbar-h: 60px;
+  --sleep-area-h: 96px;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #17181a;
+    --card: #222427;
+    --text: #ececec;
+    --muted: #a0a0a0;
+    --line: #34363a;
+    --accent: #7aa7dc;
+    --accent-soft: #24354a;
+    --warn: #e0a070;
+    --danger: #e07a7a;
+    --sleep: #3d5f99;
+    --wake: #b07a14;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP',
+    'Yu Gothic', Meiryo, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0 0 8px;
+  line-height: 1.3;
+}
+h1 {
+  font-size: 22px;
+}
+h2 {
+  font-size: 17px;
+}
+h3 {
+  font-size: 15px;
+}
+p {
+  margin: 0 0 8px;
+}
+
+.loading {
+  padding: 24px;
+  color: var(--muted);
+}
+
+.app {
+  min-height: 100dvh;
+}
+
+.main {
+  padding: calc(env(safe-area-inset-top) + 12px) 16px calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 24px);
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.screen.today {
+  padding-bottom: calc(var(--sleep-area-h) + 8px);
+}
+
+.muted {
+  color: var(--muted);
+}
+.small {
+  font-size: 13px;
+}
+.warn {
+  color: var(--warn);
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.day-title {
+  margin: 4px 0 12px;
+}
+
+.gentle-note {
+  background: var(--accent-soft);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 8px 0 12px;
+  font-size: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.sleeping-banner {
+  position: sticky;
+  top: env(safe-area-inset-top);
+  z-index: 5;
+  background: var(--sleep);
+  color: #fff;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.sleep-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.sleep-list li {
+  padding: 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex: none;
+}
+.dot.c1 {
+  background: var(--c1);
+}
+.dot.c2 {
+  background: var(--c2);
+}
+.dot.c3 {
+  background: var(--c3);
+}
+.dot.c4 {
+  background: var(--c4);
+}
+
+/* 選択肢のボタン */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chip {
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 22px;
+  border: 1.5px solid var(--line);
+  background: var(--card);
+  font-size: 15px;
+}
+.chip.on {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+.slot-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+}
+.slot-label {
+  width: 1.5em;
+  flex: none;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.slider {
+  padding: 4px 0;
+}
+.slider-value {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+}
+.slider input[type='range'] {
+  width: 100%;
+  height: 44px;
+  accent-color: var(--accent);
+}
+.slider-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.text-input,
+.field input,
+.field select,
+select {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1.5px solid var(--line);
+  background: var(--card);
+  font-size: 16px;
+}
+
+.field {
+  display: block;
+  margin-bottom: 12px;
+}
+.field-label {
+  display: block;
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.field-row {
+  display: flex;
+  gap: 8px;
+}
+.field-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+.check-row input {
+  width: 22px;
+  height: 22px;
+}
+
+/* ボタン */
+.btn-primary,
+.btn-secondary,
+.btn-danger {
+  min-height: 48px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-primary:disabled {
+  opacity: 0.4;
+}
+.btn-secondary {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.btn-danger {
+  background: transparent;
+  color: var(--danger);
+  border: 1.5px solid var(--danger);
+}
+.btn-text {
+  background: none;
+  border: none;
+  color: var(--accent);
+  padding: 8px;
+  min-height: 44px;
+}
+.btn-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--accent);
+  text-decoration: underline;
+}
+.btn-block {
+  width: 100%;
+}
+
+/* 睡眠ボタン:片手で押せるよう、タブのすぐ上に固定 */
+.sleep-button-area {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+  padding: 10px 16px;
+  background: linear-gradient(to top, var(--bg) 70%, transparent);
+  z-index: 10;
+}
+.sleep-button {
+  display: block;
+  width: 100%;
+  max-width: 608px;
+  margin: 0 auto;
+  height: 72px;
+  border-radius: 36px;
+  border: none;
+  background: var(--sleep);
+  color: #fff;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+}
+.sleep-button.wake {
+  background: var(--wake);
+}
+.sleep-button:active {
+  transform: scale(0.98);
+}
+
+/* 下部のタブ */
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+  display: flex;
+  background: var(--card);
+  border-top: 1px solid var(--line);
+  z-index: 20;
+}
+.tab {
+  flex: 1;
+  border: none;
+  background: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.tab-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+.tab.active {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* 下から出る画面 */
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.sheet {
+  background: var(--card);
+  width: 100%;
+  max-width: 640px;
+  max-height: 90dvh;
+  overflow-y: auto;
+  border-radius: 18px 18px 0 0;
+  padding: 16px 16px calc(env(safe-area-inset-bottom) + 16px);
+}
+.sheet-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.sheet-head h2 {
+  margin: 0;
+  font-size: 19px;
+}
+.sheet-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.sheet-actions .btn-primary {
+  flex: 1;
+}
