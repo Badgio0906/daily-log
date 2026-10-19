@@ -6,6 +6,11 @@ import './styles.css'
 
 const root = createRoot(document.getElementById('root')!)
 
+// 開発中の動作確認用(公開版には含まれない)
+if (import.meta.env.DEV) {
+  import('./db/db').then((m) => Object.assign(window, { __dailyLog: m }))
+}
+
 ensureInitialized()
   .then(() => {
     // 端末の空き容量が少ないときに、記録が勝手に消されにくくする

@@ -12,10 +12,10 @@
   --sleep: #2f4a7a;
   --wake: #c98a1c;
   /* 回ごとの色(1回目・2回目・3回目・4回目以降)。グラフと同じ */
-  --c1: #3b6ea8;
-  --c2: #e08a2e;
-  --c3: #3a9a6a;
-  --c4: #8a5cb8;
+  --c1: #2a78d6;
+  --c2: #eb6834;
+  --c3: #1baf7a;
+  --c4: #eda100;
   --tabbar-h: 60px;
   --sleep-area-h: 96px;
   color-scheme: light dark;
@@ -34,6 +34,10 @@
     --danger: #e07a7a;
     --sleep: #3d5f99;
     --wake: #b07a14;
+    --c1: #3987e5;
+    --c2: #d95926;
+    --c3: #199e70;
+    --c4: #c98500;
   }
 }
 
@@ -492,4 +496,38 @@ select {
   text-align: right;
   max-width: 50%;
   overflow-wrap: anywhere;
+}
+
+/* 振り返り */
+.period {
+  margin-bottom: 8px;
+}
+.period-range {
+  align-items: center;
+  margin-top: 8px;
+}
+.period-range input {
+  min-height: 44px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  border: 1.5px solid var(--line);
+  background: var(--card);
+}
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.dot.faint {
+  opacity: 0.35;
+}
+.echart {
+  width: 100%;
 }
